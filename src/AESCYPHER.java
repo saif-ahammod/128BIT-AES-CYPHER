@@ -12,8 +12,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class AESCYPHER {
-	
-	private static final String encryptionKey           = "ABCDEFGHIJKLMNOP";
+	 
     private static final String characterEncoding       = "UTF-8";
     private static final String cipherTransformation    = "AES/CBC/PKCS5PADDING";
     private static final String aesEncryptionAlgorithem = "AES";
@@ -84,7 +83,11 @@ public class AESCYPHER {
 		System.out.println("Encryption Completed Successfully....");
 	}
 	
+	//Main E
 	private static String encrypt(String plainText) {
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("ENTER A 16 Digit Key: ");
+		String encryptionKey = scanner.nextLine();
 		String encryptedText = "";
         try {
             Cipher cipher   = Cipher.getInstance(cipherTransformation);
@@ -109,10 +112,18 @@ public class AESCYPHER {
 		// TODO Auto-generated method stub
 		System.out.println("Decrypt Cyphertext into Plaintext:");
 		System.out.println("Decription Started....");
-		
-		
-		
-		
+		String cyphertext ;
+
+		Path fileName = Path.of("givencyphertext.txt");
+		// Retrive plaintext from the givencleartext.txt file
+		String Stringcyphertext = null;
+		try {
+			Stringcyphertext = Files.readString(fileName);
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private static void readme() {
