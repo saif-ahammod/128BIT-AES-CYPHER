@@ -1,4 +1,6 @@
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 
 import java.nio.file.Files;
@@ -12,51 +14,39 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class AESCYPHER {
-	 
-    private static final String characterEncoding       = "UTF-8";
-    private static final String cipherTransformation    = "AES/CBC/PKCS5PADDING";
-    private static final String aesEncryptionAlgorithem = "AES";
-    
+
+	private static final String characterEncoding = "UTF-8";
+	private static final String cipherTransformation = "AES/CBC/PKCS5PADDING";
+	private static final String aesEncryptionAlgorithem = "AES";
 
 	public static void main(String[] args) {
-
 		Scanner scanner = new Scanner(System.in); // System.in is a standard input stream.
-
-		while (true) {
-			System.out.println("Encrypt: A ");
-			System.out.println("Decrypt: B ");
-			System.out.println("Readme: C ");
-			System.out.println("EXIT: E ");
-			System.out.print("Choose Your Option: ");
-			char option = scanner.next().charAt(0); // reads char.
-			System.out.flush();
-
-			if (option == 'A' || option == 'a') {
-
-				encryptprocess();
-			} else if (option == 'B' || option == 'b') {
-
-				decryptprocess();
-
-			} else if (option == 'C' || option == 'c') {
-				readme();
-
-			} else if (option == 'E' || option == 'e') {
-				return;
-			} else {
-				System.out.println("Wrong Key pressed");
-			}
-		}
+		System.out.println("ENTER A 16 Digit Key: ");
+		String encryptionKey = scanner.nextLine();
+		System.out.println("Process Started.... ");
+		encryptprocess(encryptionKey);
+		decryptprocess(encryptionKey);
+		System.out.println("Process Finished.... ");
 	}
 
-	private static void encryptprocess() {
+	private static void encryptprocess(String encryptionKey) {
 		// TODO Auto-generated method stub
-		System.out.println("Encrypt Plaintext into Cyphertext:");
-		System.out.println("Encryption Started....");
-		String cyphertext ;
+		System.out.println("Encryption process Started.... ");
+		String cyphertext;
+		System.out.println("Locating File...");
+		String pathofinput = FileLocator();//getting the file name
+		if(pathofinput==null) {
 
-		Path fileName = Path.of("givencleartext.txt");
-		// Retrive plaintext from the givencleartext.txt file
+			System.out.println("No file found");
+			return;
+		}
+		else {
+			System.out.println("File Found");
+		}
+
+		Path fileName = Path.of(pathofinput);
+		
+		// Retrive plaintext from the java AES_Cipher filename.txt file
 		String Stringplaintext = null;
 		try {
 			Stringplaintext = Files.readString(fileName);
@@ -65,10 +55,8 @@ public class AESCYPHER {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//Encrypt cleartexthere
-		cyphertext = encrypt(Stringplaintext);
-		
-		
+		// Encrypt java AES_Cipher filename.txt
+		cyphertext = encrypt(Stringplaintext, encryptionKey);
 
 		// Save cyphertext into the crypto.txt file
 		Path crypto = Path.of("crypto.txt");
@@ -80,67 +68,98 @@ public class AESCYPHER {
 			e.printStackTrace();
 		}
 		
-		System.out.println("Encryption Completed Successfully....");
+		System.out.println("Encryption process Finished.... ");
 	}
-	
-	//Main E
-	private static String encrypt(String plainText) {
+
+	// Main E
+	private static String encrypt(String plainText, String encryptionKey) {
 		Scanner scanner = new Scanner(System.in);
-		System.out.println("ENTER A 16 Digit Key: ");
-		String encryptionKey = scanner.nextLine();
-		String encryptedText = "";
-        try {
-            Cipher cipher   = Cipher.getInstance(cipherTransformation);
-            byte[] key      = encryptionKey.getBytes(characterEncoding);
-            SecretKeySpec secretKey = new SecretKeySpec(key, aesEncryptionAlgorithem);
-            IvParameterSpec ivparameterspec = new IvParameterSpec(key);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivparameterspec);
-            byte[] cipherText = cipher.doFinal(plainText.getBytes("UTF8"));
-            Base64.Encoder encoder = Base64.getEncoder();
-            encryptedText = encoder.encodeToString(cipherText);
 
-        } catch (Exception E) {
-             System.err.println("Encrypt Exception : "+E.getMessage());
-        }
-        return encryptedText;
-		
+		String encryptedText = "";
+		try {
+			Cipher cipher = Cipher.getInstance(cipherTransformation);
+			byte[] key = encryptionKey.getBytes(characterEncoding);
+			SecretKeySpec secretKey = new SecretKeySpec(key, aesEncryptionAlgorithem);
+			IvParameterSpec ivparameterspec = new IvParameterSpec(key);
+			cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivparameterspec);
+			byte[] cipherText = cipher.doFinal(plainText.getBytes("UTF8"));
+			Base64.Encoder encoder = Base64.getEncoder();
+			encryptedText = encoder.encodeToString(cipherText);
+
+		} catch (Exception E) {
+			System.err.println("Encrypt Exception : " + E.getMessage());
+		}
+		return encryptedText;
+
 	}
 
-	
-
-	private static void decryptprocess() {
+	private static void decryptprocess(String encryptionKey) {
+		
+		String pathofinput = FileLocator();//getting the file name
+		if(pathofinput==null) {
+			return;
+		}
 		// TODO Auto-generated method stub
-		System.out.println("Decrypt Cyphertext into Plaintext:");
-		System.out.println("Decription Started....");
-		String cyphertext ;
-
-		Path fileName = Path.of("givencyphertext.txt");
+		System.out.println("Decryption process Started.... ");
+		String cyphertext;
+		Path fileName = Path.of("crypto.txt");
 		// Retrive plaintext from the givencleartext.txt file
 		String Stringcyphertext = null;
 		try {
 			Stringcyphertext = Files.readString(fileName);
-
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		cyphertext = decrypt(Stringcyphertext, encryptionKey);
+		// Save cleartext into the cleartext.txt file
+				Path cleartext = Path.of("cleartext.txt");
+
+				try {
+					Files.writeString(cleartext, cyphertext);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.println("Decryption process Finished.... ");
 	}
 
-	private static void readme() {
+	private static String decrypt(String stringcyphertext, String encryptionKey) {
 		// TODO Auto-generated method stub
-		System.out.println("Readme File:");
-		Path readme = Path.of("readme.txt");
-		// Retrive file from the .txt file
-		String ReadmeString;
-		try {
-			ReadmeString = Files.readString(readme);
-			System.out.println(ReadmeString);
+		
+		String decryptedText = "";
+        try {
+            Cipher cipher = Cipher.getInstance(cipherTransformation);
+            byte[] key = encryptionKey.getBytes(characterEncoding);
+            SecretKeySpec secretKey = new SecretKeySpec(key, aesEncryptionAlgorithem);
+            IvParameterSpec ivparameterspec = new IvParameterSpec(key);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivparameterspec);
+            Base64.Decoder decoder = Base64.getDecoder();
+            byte[] cipherText = decoder.decode(stringcyphertext.getBytes("UTF8"));
+            decryptedText = new String(cipher.doFinal(cipherText), "UTF-8");
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+        } catch (Exception E) {
+            System.err.println("decrypt Exception : "+E.getMessage());
+        }
+        return decryptedText;
+	}
+
+	private static String FileLocator() {
+		// TODO Auto-generated method stub
+		
+		File dir = new File(".");
+		FilenameFilter filter = new FilenameFilter() {
+			public boolean accept(File dir, String name) {
+				return name.startsWith("java AES_Cipher");
+			}
+		};
+		String[] children = dir.list(filter);
+		if (children == null) {
+			System.out.println("No file found.");
+			return null;
+		} else {
+			String filename = children[0];
+			return filename;
 		}
 	}
-	
-	
 }
