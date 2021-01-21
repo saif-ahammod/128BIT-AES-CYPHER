@@ -13,7 +13,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-public class AESCYPHER {
+public class AES_Cipher {
 
 	private static final String characterEncoding = "UTF-8";
 	private static final String cipherTransformation = "AES/CBC/PKCS5PADDING";
@@ -42,6 +42,7 @@ public class AESCYPHER {
 		}
 		else {
 			System.out.println("File Found");
+			System.out.println("File Name:"+pathofinput);
 		}
 
 		Path fileName = Path.of(pathofinput);
@@ -59,10 +60,10 @@ public class AESCYPHER {
 		cyphertext = encrypt(Stringplaintext, encryptionKey);
 
 		// Save cyphertext into the crypto.txt file
-		Path crypto = Path.of("crypto.txt");
+		Path c = Path.of("crypto.txt");
 
 		try {
-			Files.writeString(crypto, cyphertext);
+			Files.writeString(c, cyphertext);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,7 +76,7 @@ public class AESCYPHER {
 	private static String encrypt(String plainText, String encryptionKey) {
 		Scanner scanner = new Scanner(System.in);
 
-		String encryptedText = "";
+		String StringEncText = "";
 		try {
 			Cipher cipher = Cipher.getInstance(cipherTransformation);
 			byte[] key = encryptionKey.getBytes(characterEncoding);
@@ -84,12 +85,12 @@ public class AESCYPHER {
 			cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivparameterspec);
 			byte[] cipherText = cipher.doFinal(plainText.getBytes("UTF8"));
 			Base64.Encoder encoder = Base64.getEncoder();
-			encryptedText = encoder.encodeToString(cipherText);
+			StringEncText = encoder.encodeToString(cipherText);
 
 		} catch (Exception E) {
 			System.err.println("Encrypt Exception : " + E.getMessage());
 		}
-		return encryptedText;
+		return StringEncText;
 
 	}
 
@@ -102,21 +103,21 @@ public class AESCYPHER {
 		// TODO Auto-generated method stub
 		System.out.println("Decryption process Started.... ");
 		String cyphertext;
-		Path fileName = Path.of("crypto.txt");
+		Path c = Path.of("crypto.txt");
 		// Retrive plaintext from the givencleartext.txt file
 		String Stringcyphertext = null;
 		try {
-			Stringcyphertext = Files.readString(fileName);
+			Stringcyphertext = Files.readString(c);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		cyphertext = decrypt(Stringcyphertext, encryptionKey);
 		// Save cleartext into the cleartext.txt file
-				Path cleartext = Path.of("cleartext.txt");
+				Path r = Path.of("cleartext.txt");
 
 				try {
-					Files.writeString(cleartext, cyphertext);
+					Files.writeString(r, cyphertext);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -127,7 +128,7 @@ public class AESCYPHER {
 	private static String decrypt(String stringcyphertext, String encryptionKey) {
 		// TODO Auto-generated method stub
 		
-		String decryptedText = "";
+		String StringDecText = "";
         try {
             Cipher cipher = Cipher.getInstance(cipherTransformation);
             byte[] key = encryptionKey.getBytes(characterEncoding);
@@ -136,30 +137,30 @@ public class AESCYPHER {
             cipher.init(Cipher.DECRYPT_MODE, secretKey, ivparameterspec);
             Base64.Decoder decoder = Base64.getDecoder();
             byte[] cipherText = decoder.decode(stringcyphertext.getBytes("UTF8"));
-            decryptedText = new String(cipher.doFinal(cipherText), "UTF-8");
+            StringDecText = new String(cipher.doFinal(cipherText), "UTF-8");
 
         } catch (Exception E) {
             System.err.println("decrypt Exception : "+E.getMessage());
         }
-        return decryptedText;
+        return StringDecText;
 	}
 
 	private static String FileLocator() {
 		// TODO Auto-generated method stub
 		
-		File dir = new File(".");
+		File path = new File(".");
 		FilenameFilter filter = new FilenameFilter() {
 			public boolean accept(File dir, String name) {
 				return name.startsWith("java AES_Cipher");
 			}
 		};
-		String[] children = dir.list(filter);
-		if (children == null) {
+		String[] files = path.list(filter);
+		if (files == null) {
 			System.out.println("No file found.");
 			return null;
 		} else {
-			String filename = children[0];
-			return filename;
+			String StringFilename = files[0];
+			return StringFilename;
 		}
 	}
 }
